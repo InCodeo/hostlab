@@ -1,0 +1,441 @@
+# Compiled dynamic libraries
+*.dll
+*.so
+*.dylib
+*.lib
+
+# Compiled object files and temporary build files
+*.o
+*.obj
+*.exe
+*.tmp
+*.temp
+
+# Packaged archives
+*.7z
+*.zip
+*.tar.gz
+*.rar
+*.iso
+
+# Media files
+*.png
+*.jpeg
+*.jpg
+*.gif
+*.bmp
+*.tiff
+*.ico
+*.webp
+
+# Document files
+*.pdf
+*.doc
+*.docx
+*.ppt
+*.pptx
+*.xls
+*.xlsx
+
+# Log and database files
+*.log
+*.sql
+*.sqlite
+*.sqlite3
+*.db
+
+# OS generated files
+.DS_Store
+.Thumbs.db
+Desktop.ini
+ehthumbs.db
+nlstags.ini
+
+# Node modules and package lock files
+node_modules/
+package-lock.json
+yarn.lock
+
+# Rust compilation artifacts
+/target/
+
+# Environment variables and secrets
+.env
+.secret
+
+# Sound and Video Files
+*.mp3
+*.wav
+*.flac
+*.aac
+*.ogg
+*.m4a
+*.wma
+*.mp4
+*.mov
+*.wmv
+*.flv
+*.avi
+*.mkv
+*.mpeg
+*.mpg
+
+# Folders
+*build*
+*venv*
+*pyc*
+*test*
+
+
+# Random ones I can think of that could go either way
+LICENSE
+repo.py
+*prompt*
+*jfk.flac*
+*.pickle*
+*.doctree*
+README.md
+
+*poetry.lock*
+*.env.example*
+.pylintrc
+.coveragerc
+*.pem
+
+# Minified and source map files
+*.min.js
+*.min.css
+*.map
+
+# Vector graphics
+*.svg
+
+# Configuration and environment files
+*.config.js
+*.conf
+.dockerignore
+
+# Build and package management files
+webpack.config.js
+rollup.config.js
+gulpfile.js
+Gruntfile.js
+
+# Documentation
+docs/
+*.md
+LICENSE*
+
+# Test files
+test/
+tests/
+spec/
+__tests__/
+
+# Editor and IDE files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Dependency directories
+vendor/
+
+# Compiled output directories
+dist/
+out/
+
+# Temporary and cache directories
+.cache/
+.temp/
+tmp/
+
+# Miscellaneous
+*.bak
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Existing entries from the previous gitignore...
+
+# Additional entries:
+
+# Fonts
+*.woff
+*.woff2
+*.eot
+*.ttf
+*.otf
+
+# JSON files (except for crucial configuration)
+*.json
+!package.json
+!tsconfig.json
+
+# Library and vendor files
+**/lib/
+**/vendor/
+**/node_modules/
+
+# Build outputs
+**/dist/
+**/build/
+**/.next/
+
+# Bundled files
+*.bundle.js
+
+# Minified files (if not already covered)
+*.min.*
+
+# Source maps
+*.map
+
+# Documentation
+*.md
+**/docs/
+**/doc/
+**/documentation/
+
+# Config files (except for crucial ones)
+*.config.js
+!webpack.config.js
+!rollup.config.js
+
+# Cache directories
+**/.cache/
+**/__pycache__/
+
+# Virtual environments
+**/venv/
+**/.env/
+
+# Python compiled files
+*.pyc
+*.pyo
+*.pyd
+
+# Jupyter Notebook
+*.ipynb
+.ipynb_checkpoints
+
+# TypeScript declaration files
+*.d.ts
+
+# Test directories and files
+**/test/
+**/tests/
+**/spec/
+**/__tests__/
+*.test.js
+*.spec.js
+
+# Linter and formatter configs (keep only if crucial)
+.eslintrc*
+.prettierrc*
+.stylelintrc*
+
+# Editor directories and files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Backup files
+*.bak
+*.swp
+*.swo
+
+# Large data files or resources
+*.csv
+*.sqlite
+*.db
+
+# Dependency lock files (keep package.json for understanding dependencies)
+yarn.lock
+package-lock.json
+
+# Generated or compiled CSS (assuming you want to focus on source files)
+*.css
+!src/**/*.css
+
+# Temporary files
+*.tmp
+*.temp
+.eslintcache
+
+# Specific large JS files you mentioned
+**/glyphlist.js
+**/popper.js
+
+# Ignoring common framework-specific directories
+**/node_modules/
+**/.nuxt/
+**/bower_components/
+
+# Ignoring any minified or bundled files
+**/*-min.js
+**/*.chunk.js
+
+# Python-specific
+*.egg-info/
+*.egg
+*.py[cod]
+__pycache__/
+*.so
+.Python
+develop-eggs/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+.installed.cfg
+MANIFEST
+
+# Pytest
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# JavaScript-specific
+.npm
+.eslintcache
+.node_repl_history
+.yarn-integrity
+.webpack/
+.serverless/
+.fusebox/
+.dynamodb/
+.tern-port
+.vscode-test
+.docusaurus
+
+# Gatsby files
+.cache/
+public
+
+# Next.js
+.next/
+out/
+
+# Nuxt.js
+.nuxt/
+dist/
+
+# Storybook
+storybook-static/
+
+# VuePress
+.vuepress/dist
+
+# Serverless
+.serverless/
+
+# FuseBox
+.fusebox/
+
+# DynamoDB Local files
+.dynamodb/
+
+# TernJS port file
+.tern-port
+
+# Stores VSCode versions used for testing VSCode extensions
+.vscode-test
+
+# Temporary folders
+temp/
+tmp/
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Bower dependency directory (https://bower.io/)
+bower_components
+
+# Coveralls
+.coveralls.yml
+
+# Grunt intermediate storage (https://gruntjs.com/creating-plugins#storing-task-files)
+.grunt
+
+# node-waf configuration
+.lock-wscript
+
+# Compiled binary addons (https://nodejs.org/api/addons.html)
+build/Release
+
+# Dependency directories
+jspm_packages/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# dotenv environment variables file
+.env.test
+.env.production
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# REPO SPECIFIC
+.gptignore
+*prompt*
+*copy*
