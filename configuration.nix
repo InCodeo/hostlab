@@ -16,20 +16,10 @@
   # Enable Flakes
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-  # Create www-data user and group
-  users.users.www-data = {
-    isSystemUser = true;
-    group = "www-data";
-    uid = 33;  # Standard www-data UID
-  };
-  users.groups.www-data = {
-    gid = 33;  # Standard www-data GID
-  };
-
   # User configuration
   users.users.admin = {
     isNormalUser = true;
-    extraGroups = [ "wheel" "docker" "networkmanager" "www-data" ];
+    extraGroups = [ "wheel" "docker" "networkmanager" ];
     initialPassword = "changeme";
   };
 
@@ -68,36 +58,33 @@
     autoPrune.enable = true;
   };
 
-  # Directory structure for GroupOffice with correct permissions
+  # Directory structure for GroupOffice
   systemd.tmpfiles.rules = [
-    # Base directories with execute permissions
-    "d /usr/local/share/groupoffice 0755 www-data www-data -"
-    "d /usr/local/share/groupoffice/install 0755 www-data www-data -"
-    
-    # Data directories
-    "d /var/lib/groupoffice 0755 www-data www-data -"
-    "d /var/lib/groupoffice/data 0755 www-data www-data -"
-    "d /var/lib/groupoffice/config 0755 www-data www-data -"
-    "d /var/lib/groupoffice/mariadb 0755 www-data www-data -"
-    "d /var/lib/groupoffice/tmp 1777 www-data www-data -"
-    
-    # Config directory
-    "d /etc/groupoffice 0755 www-data www-data -"
-    "f /etc/groupoffice/config.php 0644 www-data www-data -"
+    "d /usr/local/share/groupoffice 0755 root root -"
+    "d /var/lib/groupoffice 0755 root root -"
+    "d /var/lib/groupoffice/data 0755 root root -"
+    "d /var/lib/groupoffice/config 0755 root root -"
+    "d /var/lib/groupoffice/mariadb 0755 root root -"
+    "d /var/lib/groupoffice/tmp 1777 root root -"
+    "d /etc/groupoffice 0755 root root -"
   ];
 
-  # Ensure directories exist and have correct permissions
-  system.activationScripts.groupoffice-dirs = {
+  # Create initial config.php file
+  system.activationScripts.groupoffice-config = {
     text = ''
-      mkdir -p /usr/local/share/groupoffice
-      mkdir -p /var/lib/groupoffice
       mkdir -p /etc/groupoffice
-      chown -R www-data:www-data /usr/local/share/groupoffice
-      chown -R www-data:www-data /var/lib/groupoffice
-      chown -R www-data:www-data /etc/groupoffice
-      chmod -R 755 /usr/local/share/groupoffice
-      chmod -R 755 /var/lib/groupoffice
-      chmod -R 755 /etc/groupoffice
+      cat > /etc/groupoffice/config.php << 'EOF'
+<?php
+$config['db_name'] = 'groupoffice';
+$config['db_host'] = 'db';
+$config['db_user'] = 'groupoffice';
+$config['db_pass'] = 'groupoffice';
+$config['db_port'] = 3306;
+$config['file_storage_path'] = '/var/lib/groupoffice';
+$config['tmpdir'] = '/tmp/groupoffice';
+$config['debug'] = true;
+EOF
+      chmod 644 /etc/groupoffice/config.php
     '';
   };
 
@@ -105,13 +92,11 @@
   services.cron = {
     enable = true;
     systemCronJobs = [
-      "* * * * * www-data docker exec groupoffice php /usr/local/share/groupoffice/cron.php"
+      "* * * * * root docker exec groupoffice php /usr/local/share/groupoffice/cron.php"
     ];
   };
 
   # Container configurations
-  # Update these sections in your configuration.nix
-
   virtualisation.oci-containers = {
     backend = "docker";
     containers = {
@@ -125,18 +110,18 @@
           MYSQL_DATABASE = "groupoffice";
           MYSQL_USER = "groupoffice";
           MYSQL_PASSWORD = "groupoffice";
-          PHP_UPLOAD_MAX_FILESIZE = "128M";
-          PHP_POST_MAX_SIZE = "128M";
-          PHP_MEMORY_LIMIT = "512M";
-          # Add these to force database configuration
           GO_CONFIG_DATABASE_HOST = "db";
           GO_CONFIG_DATABASE_NAME = "groupoffice";
           GO_CONFIG_DATABASE_USER = "groupoffice";
           GO_CONFIG_DATABASE_PASSWORD = "groupoffice";
+          PHP_UPLOAD_MAX_FILESIZE = "128M";
+          PHP_POST_MAX_SIZE = "128M";
+          PHP_MEMORY_LIMIT = "512M";
         };
         volumes = [
           "/var/lib/groupoffice/data:/var/lib/groupoffice"
           "/etc/groupoffice:/etc/groupoffice"
+          "/var/lib/groupoffice/tmp:/tmp/groupoffice"
         ];
         extraOptions = [
           "--network=proxy-network"
