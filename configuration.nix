@@ -1,3 +1,4 @@
+# configuration.nix
 { config, pkgs, lib, ... }:
 
 {
@@ -34,7 +35,7 @@
     # Basic firewall configuration
     firewall = {
       enable = true;
-      allowedTCPPorts = [ 22 9000 ]; # SSH and GroupOffice
+      allowedTCPPorts = [ 22 9000 3306 ]; # SSH, GroupOffice, and MariaDB
     };
   };
 
@@ -63,6 +64,8 @@
     "d /var/lib/groupoffice/data 0750 admin docker -"
     "d /var/lib/groupoffice/config 0750 admin docker -"
     "d /var/lib/groupoffice/mariadb 0750 admin docker -"
+    "d /etc/groupoffice 0770 admin docker -"
+    "f /etc/groupoffice/config.php 0660 admin docker -"
   ];
 
   # Container configurations
@@ -78,11 +81,11 @@
           MYSQL_USER = "groupoffice";
           MYSQL_PASSWORD = "groupoffice";
           MYSQL_DATABASE = "groupoffice";
-          MYSQL_HOST = "db";
+          MYSQL_HOST = "groupoffice-db";
         };
         volumes = [
           "/var/lib/groupoffice/data:/var/lib/groupoffice"
-          "/var/lib/groupoffice/config:/etc/groupoffice"
+          "/etc/groupoffice:/etc/groupoffice"
         ];
         extraOptions = [
           "--network=proxy-network"
@@ -93,6 +96,7 @@
       groupoffice-db = {
         image = "mariadb:11.1.2";
         autoStart = true;
+        ports = [ "3306:3306" ];
         environment = {
           TZ = "Australia/Sydney";
           MYSQL_ROOT_PASSWORD = "groupoffice";
