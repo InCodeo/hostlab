@@ -11,7 +11,7 @@
   boot.loader.efi.canTouchEfiVariables = true;
 
   # Basic system configuration
-  system.stateVersion = "23.11";
+  system.stateVersion = "24.05";
 
   # Enable Flakes
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
@@ -45,8 +45,13 @@
   # Enable SSH
   services.openssh = {
     enable = true;
-    settings.PermitRootLogin = "yes";
-    settings.PasswordAuthentication = false;
+    settings = {
+      PasswordAuthentication = true;  # Will be disabled after initial setup
+      PermitRootLogin = "yes";       # Will be disabled after initial setup
+      X11Forwarding = false;
+      PermitEmptyPasswords = false;
+      MaxAuthTries = 3;
+    };
   };
 
   # Enable Tailscale
