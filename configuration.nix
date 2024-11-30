@@ -35,7 +35,7 @@
     # Basic firewall configuration
     firewall = {
       enable = true;
-      allowedTCPPorts = [ 22 9000 3306 ]; # SSH, GroupOffice, and MariaDB
+      allowedTCPPorts = [ 22 9000 3306 993 465 ]; # SSH, GroupOffice, and MariaDB
     };
   };
 
