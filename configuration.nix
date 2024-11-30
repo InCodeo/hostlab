@@ -35,7 +35,7 @@
     # Basic firewall configuration
     firewall = {
       enable = true;
-      allowedTCPPorts = [ 22 9000 ]; # SSH and GroupOffice
+      allowedTCPPorts = [ 22 9000 3306 ]; # SSH, GroupOffice, and MariaDB
     };
   };
 
@@ -60,14 +60,22 @@
 
   # Directory structure for GroupOffice
   systemd.tmpfiles.rules = [
-    "d /var/lib/groupoffice 0750 admin docker -"
-    "d /var/lib/groupoffice/data 0750 admin docker -"
-    "d /var/lib/groupoffice/config 0750 admin docker -"
-    "d /var/lib/groupoffice/mariadb 0750 admin docker -"
-    "d /var/lib/groupoffice/tmp 1777 admin docker -"
+    "d /var/lib/groupoffice 0770 admin docker -"
+    "d /var/lib/groupoffice/data 0770 admin docker -"
+    "d /var/lib/groupoffice/config 0770 admin docker -"
+    "d /var/lib/groupoffice/mariadb 0770 admin docker -"
+    "d /usr/local/share/groupoffice 0770 admin docker -"
     "d /etc/groupoffice 0770 admin docker -"
     "f /etc/groupoffice/config.php 0660 admin docker -"
   ];
+
+  # Cron job for GroupOffice
+  services.cron = {
+    enable = true;
+    systemCronJobs = [
+      "* * * * * admin docker exec groupoffice php /usr/local/share/groupoffice/cron.php"
+    ];
+  };
 
   # Container configurations
   virtualisation.oci-containers = {
@@ -79,30 +87,29 @@
         ports = [ "9000:80" ];
         environment = {
           TZ = "Australia/Sydney";
-          PUID = "1001";  # admin user
-          PGID = "131";   # docker group
+          MYSQL_HOST = "db";  # Changed to match official example
+          MYSQL_DATABASE = "groupoffice";
           MYSQL_USER = "groupoffice";
           MYSQL_PASSWORD = "groupoffice";
-          MYSQL_DATABASE = "groupoffice";
-          MYSQL_HOST = "groupoffice-db";
           PHP_UPLOAD_MAX_FILESIZE = "128M";
           PHP_POST_MAX_SIZE = "128M";
           PHP_MEMORY_LIMIT = "512M";
         };
         volumes = [
-          "/var/lib/groupoffice/data:/var/lib/groupoffice"
-          "/var/lib/groupoffice/tmp:/tmp/groupoffice"
+          "/var/lib/groupoffice:/var/lib/groupoffice"
+          "/usr/local/share/groupoffice:/usr/local/share/groupoffice"
           "/etc/groupoffice:/etc/groupoffice"
         ];
         extraOptions = [
           "--network=proxy-network"
         ];
-        dependsOn = [ "groupoffice-db" ];
+        dependsOn = [ "db" ];
       };
 
-      groupoffice-db = {
-        image = "mariadb:11.1.2";
+      db = {  # Changed name to match official example
+        image = "mariadb:11.5.2";  # Updated to latest stable version
         autoStart = true;
+        ports = [ "3306:3306" ];
         environment = {
           TZ = "Australia/Sydney";
           MYSQL_ROOT_PASSWORD = "groupoffice";
@@ -121,7 +128,7 @@
     };
   };
 
-  # Modified docker network service
+  # Docker network service
   systemd.services.create-docker-network = {
     description = "Create docker network for GroupOffice";
     after = [ "docker.service" ];
