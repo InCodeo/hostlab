@@ -119,30 +119,25 @@
         ports = [ "9000:80" ];
         environment = {
           TZ = "Australia/Sydney";
-          MYSQL_HOST = "db";
+          MYSQL_HOST = "db";  # Changed from groupoffice-db to db
           MYSQL_DATABASE = "groupoffice";
           MYSQL_USER = "groupoffice";
           MYSQL_PASSWORD = "groupoffice";
           PHP_UPLOAD_MAX_FILESIZE = "128M";
           PHP_POST_MAX_SIZE = "128M";
           PHP_MEMORY_LIMIT = "512M";
-          APACHE_RUN_USER = "www-data";
-          APACHE_RUN_GROUP = "www-data";
-          DEBUG = "1";
         };
         volumes = [
-          "/usr/local/share/groupoffice:/usr/local/share/groupoffice"
-          "/var/lib/groupoffice:/var/lib/groupoffice"
+          "/var/lib/groupoffice/data:/var/lib/groupoffice"
           "/etc/groupoffice:/etc/groupoffice"
         ];
         extraOptions = [
           "--network=proxy-network"
-          "--user=33:33"
         ];
-        dependsOn = [ "db" ];
+        dependsOn = [ "db" ];  # Changed from groupoffice-db to db
       };
 
-      db = {
+      db = {  # Changed container name from groupoffice-db to db
         image = "mariadb:11.5.2";
         autoStart = true;
         ports = [ "3306:3306" ];
