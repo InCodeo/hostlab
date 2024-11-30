@@ -28,22 +28,18 @@
   # Updated networking configuration
   networking = {
     hostName = "groupoffice";
+    networkmanager.enable = true;
+    useDHCP = lib.mkDefault true;
     
-    # Disable wait online service
-    networkmanager = {
-      enable = true;
-      wait-online.enable = false;  # Disable waiting for network
-    };
-
     # Basic firewall configuration
     firewall = {
       enable = true;
       allowedTCPPorts = [ 22 9000 ]; # SSH and GroupOffice
     };
-    
-    # Enable DHCP by default
-    useDHCP = lib.mkDefault true;
   };
+
+  # Disable the wait-online service directly
+  systemd.services."NetworkManager-wait-online".enable = false;
 
   # Enable SSH
   services.openssh = {
@@ -115,7 +111,7 @@
     };
   };
 
-  # Modified docker network service to be more resilient
+  # Modified docker network service
   systemd.services.create-docker-network = {
     description = "Create docker network for GroupOffice";
     after = [ "docker.service" ];
@@ -152,7 +148,4 @@
     vim
     tailscale
   ];
-
-  # Systemd configuration
-  systemd.services.NetworkManager-wait-online.enable = false;
 }
