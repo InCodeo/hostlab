@@ -58,23 +58,30 @@
     autoPrune.enable = true;
   };
 
-  # Directory structure for GroupOffice with more permissive permissions
+  # Directory structure for GroupOffice with correct permissions
   systemd.tmpfiles.rules = [
-    "d /var/lib/groupoffice 0777 admin docker -"
-    "d /var/lib/groupoffice/data 0777 admin docker -"
-    "d /var/lib/groupoffice/config 0777 admin docker -"
-    "d /var/lib/groupoffice/mariadb 0777 admin docker -"
-    "d /usr/local/share/groupoffice 0777 admin docker -"
-    "d /etc/groupoffice 0777 admin docker -"
-    "f /etc/groupoffice/config.php 0666 admin docker -"
-    "d /var/lib/groupoffice/tmp 1777 admin docker -"
+    # Base directories with execute permissions
+    "d /usr/local/share 0755 root root -"
+    "d /usr/local/share/groupoffice 0755 www-data www-data -"
+    "d /usr/local/share/groupoffice/install 0755 www-data www-data -"
+    
+    # Data directories
+    "d /var/lib/groupoffice 0755 www-data www-data -"
+    "d /var/lib/groupoffice/data 0755 www-data www-data -"
+    "d /var/lib/groupoffice/config 0755 www-data www-data -"
+    "d /var/lib/groupoffice/mariadb 0755 www-data www-data -"
+    "d /var/lib/groupoffice/tmp 1777 www-data www-data -"
+    
+    # Config directory
+    "d /etc/groupoffice 0755 www-data www-data -"
+    "f /etc/groupoffice/config.php 0644 www-data www-data -"
   ];
 
   # Cron job for GroupOffice
   services.cron = {
     enable = true;
     systemCronJobs = [
-      "* * * * * admin docker exec groupoffice php /usr/local/share/groupoffice/cron.php"
+      "* * * * * root docker exec groupoffice php /usr/local/share/groupoffice/cron.php"
     ];
   };
 
@@ -88,30 +95,31 @@
         ports = [ "9000:80" ];
         environment = {
           TZ = "Australia/Sydney";
-          MYSQL_HOST = "db";  # Changed to match official example
+          MYSQL_HOST = "db";
           MYSQL_DATABASE = "groupoffice";
           MYSQL_USER = "groupoffice";
           MYSQL_PASSWORD = "groupoffice";
           PHP_UPLOAD_MAX_FILESIZE = "128M";
           PHP_POST_MAX_SIZE = "128M";
           PHP_MEMORY_LIMIT = "512M";
-          APACHE_RUN_USER = "admin";
-          APACHE_RUN_GROUP = "docker";
-          DEBUG = "1";  # Enable debug mode
+          APACHE_RUN_USER = "www-data";
+          APACHE_RUN_GROUP = "www-data";
+          DEBUG = "1";
         };
         volumes = [
-          "/var/lib/groupoffice:/var/lib/groupoffice"
           "/usr/local/share/groupoffice:/usr/local/share/groupoffice"
+          "/var/lib/groupoffice:/var/lib/groupoffice"
           "/etc/groupoffice:/etc/groupoffice"
         ];
         extraOptions = [
           "--network=proxy-network"
+          "--user=www-data:www-data"
         ];
         dependsOn = [ "db" ];
       };
 
-      db = {  # Changed name to match official example
-        image = "mariadb:11.5.2";  # Updated to latest stable version
+      db = {
+        image = "mariadb:11.5.2";
         autoStart = true;
         ports = [ "3306:3306" ];
         environment = {
