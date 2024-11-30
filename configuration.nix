@@ -1,4 +1,3 @@
-# configuration.nix
 { config, pkgs, lib, ... }:
 
 {
@@ -26,15 +25,24 @@
   # Create docker group
   users.groups.docker = {};
 
-  # Basic networking
+  # Updated networking configuration
   networking = {
+    hostName = "groupoffice";
+    
+    # Disable wait online service
+    networkmanager = {
+      enable = true;
+      wait-online.enable = false;  # Disable waiting for network
+    };
+
+    # Basic firewall configuration
     firewall = {
       enable = true;
       allowedTCPPorts = [ 22 9000 ]; # SSH and GroupOffice
     };
-    # Enable Tailscale
-    networkmanager.enable = true;
-    hostName = "groupoffice"; # Set your hostname
+    
+    # Enable DHCP by default
+    useDHCP = lib.mkDefault true;
   };
 
   # Enable SSH
@@ -107,17 +115,28 @@
     };
   };
 
-  # Create docker network on system startup
+  # Modified docker network service to be more resilient
   systemd.services.create-docker-network = {
     description = "Create docker network for GroupOffice";
-    after = [ "network.target" "docker.service" ];
+    after = [ "docker.service" ];
+    requires = [ "docker.service" ];
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
+      Restart = "on-failure";
+      RestartSec = "5s";
     };
     script = ''
-      # Check if network exists
+      # Wait for Docker to be ready
+      for i in {1..30}; do
+        if ${pkgs.docker}/bin/docker info >/dev/null 2>&1; then
+          break
+        fi
+        sleep 1
+      done
+      
+      # Create network if it doesn't exist
       if ! ${pkgs.docker}/bin/docker network inspect proxy-network >/dev/null 2>&1; then
         ${pkgs.docker}/bin/docker network create proxy-network
       fi
@@ -131,5 +150,9 @@
     git
     htop
     vim
+    tailscale
   ];
+
+  # Systemd configuration
+  systemd.services.NetworkManager-wait-online.enable = false;
 }
