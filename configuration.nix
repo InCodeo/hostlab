@@ -1,8 +1,15 @@
 # configuration.nix
-
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 {
+  imports = [ 
+    ./hardware-configuration.nix
+  ];
+
+  # Boot loader configuration
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+
   # Basic system configuration
   system.stateVersion = "23.11";
 
@@ -27,6 +34,7 @@
     };
     # Enable Tailscale
     networkmanager.enable = true;
+    hostName = "groupoffice"; # Set your hostname
   };
 
   # Enable SSH
