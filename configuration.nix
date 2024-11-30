@@ -35,7 +35,7 @@
     # Basic firewall configuration
     firewall = {
       enable = true;
-      allowedTCPPorts = [ 22 9000 3306 ]; # SSH, GroupOffice, and MariaDB
+      allowedTCPPorts = [ 22 9000 ]; # SSH and GroupOffice
     };
   };
 
@@ -64,6 +64,7 @@
     "d /var/lib/groupoffice/data 0750 admin docker -"
     "d /var/lib/groupoffice/config 0750 admin docker -"
     "d /var/lib/groupoffice/mariadb 0750 admin docker -"
+    "d /var/lib/groupoffice/tmp 1777 admin docker -"
     "d /etc/groupoffice 0770 admin docker -"
     "f /etc/groupoffice/config.php 0660 admin docker -"
   ];
@@ -78,13 +79,19 @@
         ports = [ "9000:80" ];
         environment = {
           TZ = "Australia/Sydney";
+          PUID = "1001";  # admin user
+          PGID = "131";   # docker group
           MYSQL_USER = "groupoffice";
           MYSQL_PASSWORD = "groupoffice";
           MYSQL_DATABASE = "groupoffice";
           MYSQL_HOST = "groupoffice-db";
+          PHP_UPLOAD_MAX_FILESIZE = "128M";
+          PHP_POST_MAX_SIZE = "128M";
+          PHP_MEMORY_LIMIT = "512M";
         };
         volumes = [
           "/var/lib/groupoffice/data:/var/lib/groupoffice"
+          "/var/lib/groupoffice/tmp:/tmp/groupoffice"
           "/etc/groupoffice:/etc/groupoffice"
         ];
         extraOptions = [
@@ -96,7 +103,6 @@
       groupoffice-db = {
         image = "mariadb:11.1.2";
         autoStart = true;
-        ports = [ "3306:3306" ];
         environment = {
           TZ = "Australia/Sydney";
           MYSQL_ROOT_PASSWORD = "groupoffice";
