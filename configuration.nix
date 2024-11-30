@@ -16,10 +16,20 @@
   # Enable Flakes
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
+  # Create www-data user and group
+  users.users.www-data = {
+    isSystemUser = true;
+    group = "www-data";
+    uid = 33;  # Standard www-data UID
+  };
+  users.groups.www-data = {
+    gid = 33;  # Standard www-data GID
+  };
+
   # User configuration
   users.users.admin = {
     isNormalUser = true;
-    extraGroups = [ "wheel" "docker" "networkmanager" ];
+    extraGroups = [ "wheel" "docker" "networkmanager" "www-data" ];
     initialPassword = "changeme";
   };
 
@@ -61,7 +71,6 @@
   # Directory structure for GroupOffice with correct permissions
   systemd.tmpfiles.rules = [
     # Base directories with execute permissions
-    "d /usr/local/share 0755 root root -"
     "d /usr/local/share/groupoffice 0755 www-data www-data -"
     "d /usr/local/share/groupoffice/install 0755 www-data www-data -"
     
@@ -77,11 +86,26 @@
     "f /etc/groupoffice/config.php 0644 www-data www-data -"
   ];
 
+  # Ensure directories exist and have correct permissions
+  system.activationScripts.groupoffice-dirs = {
+    text = ''
+      mkdir -p /usr/local/share/groupoffice
+      mkdir -p /var/lib/groupoffice
+      mkdir -p /etc/groupoffice
+      chown -R www-data:www-data /usr/local/share/groupoffice
+      chown -R www-data:www-data /var/lib/groupoffice
+      chown -R www-data:www-data /etc/groupoffice
+      chmod -R 755 /usr/local/share/groupoffice
+      chmod -R 755 /var/lib/groupoffice
+      chmod -R 755 /etc/groupoffice
+    '';
+  };
+
   # Cron job for GroupOffice
   services.cron = {
     enable = true;
     systemCronJobs = [
-      "* * * * * root docker exec groupoffice php /usr/local/share/groupoffice/cron.php"
+      "* * * * * www-data docker exec groupoffice php /usr/local/share/groupoffice/cron.php"
     ];
   };
 
@@ -113,7 +137,7 @@
         ];
         extraOptions = [
           "--network=proxy-network"
-          "--user=www-data:www-data"
+          "--user=33:33"
         ];
         dependsOn = [ "db" ];
       };
