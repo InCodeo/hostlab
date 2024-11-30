@@ -58,15 +58,16 @@
     autoPrune.enable = true;
   };
 
-  # Directory structure for GroupOffice
+  # Directory structure for GroupOffice with more permissive permissions
   systemd.tmpfiles.rules = [
-    "d /var/lib/groupoffice 0770 admin docker -"
-    "d /var/lib/groupoffice/data 0770 admin docker -"
-    "d /var/lib/groupoffice/config 0770 admin docker -"
-    "d /var/lib/groupoffice/mariadb 0770 admin docker -"
-    "d /usr/local/share/groupoffice 0770 admin docker -"
-    "d /etc/groupoffice 0770 admin docker -"
-    "f /etc/groupoffice/config.php 0660 admin docker -"
+    "d /var/lib/groupoffice 0777 admin docker -"
+    "d /var/lib/groupoffice/data 0777 admin docker -"
+    "d /var/lib/groupoffice/config 0777 admin docker -"
+    "d /var/lib/groupoffice/mariadb 0777 admin docker -"
+    "d /usr/local/share/groupoffice 0777 admin docker -"
+    "d /etc/groupoffice 0777 admin docker -"
+    "f /etc/groupoffice/config.php 0666 admin docker -"
+    "d /var/lib/groupoffice/tmp 1777 admin docker -"
   ];
 
   # Cron job for GroupOffice
@@ -94,6 +95,9 @@
           PHP_UPLOAD_MAX_FILESIZE = "128M";
           PHP_POST_MAX_SIZE = "128M";
           PHP_MEMORY_LIMIT = "512M";
+          APACHE_RUN_USER = "admin";
+          APACHE_RUN_GROUP = "docker";
+          DEBUG = "1";  # Enable debug mode
         };
         volumes = [
           "/var/lib/groupoffice:/var/lib/groupoffice"
