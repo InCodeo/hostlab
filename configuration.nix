@@ -110,6 +110,8 @@
   };
 
   # Container configurations
+  # Update these sections in your configuration.nix
+
   virtualisation.oci-containers = {
     backend = "docker";
     containers = {
@@ -119,13 +121,18 @@
         ports = [ "9000:80" ];
         environment = {
           TZ = "Australia/Sydney";
-          MYSQL_HOST = "db";  # Changed from groupoffice-db to db
+          MYSQL_HOST = "db";
           MYSQL_DATABASE = "groupoffice";
           MYSQL_USER = "groupoffice";
           MYSQL_PASSWORD = "groupoffice";
           PHP_UPLOAD_MAX_FILESIZE = "128M";
           PHP_POST_MAX_SIZE = "128M";
           PHP_MEMORY_LIMIT = "512M";
+          # Add these to force database configuration
+          GO_CONFIG_DATABASE_HOST = "db";
+          GO_CONFIG_DATABASE_NAME = "groupoffice";
+          GO_CONFIG_DATABASE_USER = "groupoffice";
+          GO_CONFIG_DATABASE_PASSWORD = "groupoffice";
         };
         volumes = [
           "/var/lib/groupoffice/data:/var/lib/groupoffice"
@@ -134,13 +141,12 @@
         extraOptions = [
           "--network=proxy-network"
         ];
-        dependsOn = [ "db" ];  # Changed from groupoffice-db to db
+        dependsOn = [ "db" ];
       };
 
-      db = {  # Changed container name from groupoffice-db to db
+      db = {
         image = "mariadb:11.5.2";
         autoStart = true;
-        ports = [ "3306:3306" ];
         environment = {
           TZ = "Australia/Sydney";
           MYSQL_ROOT_PASSWORD = "groupoffice";
